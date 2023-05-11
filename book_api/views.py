@@ -79,6 +79,14 @@ class BookList(APIView):
 
 class BookCreate(APIView):
     
+    def get(self,request):
+        routes = [
+        'GET /',
+        'GET /list',
+        'GET /:id',
+
+    ]
+        return Response(routes)
     
     def post(self,request):
         serializer = BookSerializer(data= request.data)
