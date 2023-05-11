@@ -67,7 +67,7 @@ from rest_framework import status
     
 
 from rest_framework.views import APIView
-
+from rest_framework.permissions import IsAuthenticated
 class BookList(APIView):
 
     def get(self,request):
@@ -78,7 +78,8 @@ class BookList(APIView):
         return Response(serializer.data)
 
 class BookCreate(APIView):
-
+    
+    
     def post(self,request):
         serializer = BookSerializer(data= request.data)
 
@@ -89,7 +90,7 @@ class BookCreate(APIView):
 
 class BookEdit(APIView):
 
-    
+    permission_classes = [IsAuthenticated]
     def get_book_by_pk(self,pk):
         try:
             return Book.objects.get(pk= pk)
@@ -103,7 +104,7 @@ class BookEdit(APIView):
         serializer = BookSerializer(book)
 
         return Response(serializer.data)
-
+    
     def put(self,request,pk):
         book = self.get_book_by_pk(pk)
         serializer = BookSerializer(book, data = request.data)
@@ -112,7 +113,16 @@ class BookEdit(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
     
+    def patch(self,request,pk):
+        book = self.get_book_by_pk(pk)
+        serializer = BookSerializer(book, data = request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+    
     def delete(self,request,pk):
+        
         book = self.get_book_by_pk(pk)
         book.delete()
 
